@@ -4,21 +4,63 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CineNova</title>
+
 <style>
-body { font-family: Arial; padding: 20px; background: #111; color: white; }
+body {
+  font-family: Arial;
+  background: #0f0f0f;
+  color: white;
+  padding: 20px;
+}
+
+h2, h3 { margin-top: 25px; }
+
 input, select, textarea, button {
   width: 100%;
   padding: 10px;
-  margin: 5px 0;
+  margin: 6px 0;
   border-radius: 8px;
   border: none;
 }
-button { background: #444; color: white; cursor:pointer; }
+
+button {
+  background: #333;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover { background: #444; }
+
 .card {
-  background: #222;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 10px;
+  background: #1c1c1c;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.menu {
+  display: none;
+  margin-top: 5px;
+}
+
+.menu button {
+  background: #2a2a2a;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dot {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.checkbox {
+  margin-right: 8px;
 }
 </style>
 </head>
@@ -29,8 +71,8 @@ button { background: #444; color: white; cursor:pointer; }
 <input id="title" placeholder="Title">
 
 <select id="type">
-  <option value="Movie">Movie</option>
-  <option value="Series">Series</option>
+  <option>Movie</option>
+  <option>Series</option>
 </select>
 
 <select id="genre">
@@ -50,6 +92,14 @@ button { background: #444; color: white; cursor:pointer; }
 <button onclick="addWishlist()">Add to Wishlist</button>
 <button onclick="toggleSelectMode()">Select Mode</button>
 <button onclick="deleteSelected()">Delete Selected</button>
+
+<select onchange="sortWatched(this.value)">
+  <option value="">Sort Watched</option>
+  <option value="date">By Date (Newest)</option>
+  <option value="rating">By Rating (Highest)</option>
+  <option value="alpha">Alphabetical</option>
+  <option value="genre">By Genre</option>
+</select>
 
 <h3>Watched</h3>
 <div id="watchedList"></div>
@@ -71,12 +121,12 @@ function save() {
 
 function getFormData() {
   return {
-    title: document.getElementById("title").value,
-    type: document.getElementById("type").value,
-    genre: document.getElementById("genre").value,
-    rating: document.getElementById("rating").value,
-    date: document.getElementById("date").value,
-    notes: document.getElementById("notes").value
+    title: title.value,
+    type: type.value,
+    genre: genre.value,
+    rating: rating.value,
+    date: date.value,
+    notes: notes.value
   };
 }
 
@@ -99,30 +149,54 @@ function toggleSelectMode() {
   render();
 }
 
+function toggleMenu(id) {
+  let menu = document.getElementById(id);
+  menu.style.display =
+    menu.style.display === "block" ? "none" : "block";
+}
+
 function render() {
-  let watchedDiv = document.getElementById("watchedList");
-  let wishDiv = document.getElementById("wishlist");
+  watchedList.innerHTML = "";
+  wishlist.innerHTML = "";
 
-  watchedDiv.innerHTML = "";
-  wishDiv.innerHTML = "";
-
-  watched.forEach((e, index) => {
-    watchedDiv.innerHTML += `
+  watched.forEach((e, i) => {
+    watchedList.innerHTML += `
       <div class="card">
-        ${selectMode ? `<input type="checkbox" onchange="toggleSelect('watched', ${index})">` : ""}
-        <strong>${e.title}</strong>
-        ${!selectMode ? `<button onclick="deleteWatched(${index})">⋯ Delete</button>` : ""}
-        <br>Rating: ${e.rating}/10
+        <div class="top-row">
+          <div>
+            ${selectMode ? `<input class="checkbox" type="checkbox" onchange="toggleSelect('watched', ${i})">` : ""}
+            <strong>${e.title}</strong>
+          </div>
+          ${!selectMode ? `<span class="dot" onclick="toggleMenu('w${i}')">⋯</span>` : ""}
+        </div>
+
+        <div id="w${i}" class="menu">
+          <button onclick="deleteWatched(${i})">Delete</button>
+        </div>
+
+        Rating: ${e.rating}/10<br>
+        Date: ${e.date}<br>
+        Genre: ${e.genre}
       </div>
     `;
   });
 
-  wishlist.forEach((e, index) => {
-    wishDiv.innerHTML += `
+  wishlist.forEach((e, i) => {
+    wishlist.innerHTML += `
       <div class="card">
-        ${selectMode ? `<input type="checkbox" onchange="toggleSelect('wishlist', ${index})">` : ""}
-        <strong>${e.title}</strong>
-        ${!selectMode ? `<button onclick="deleteWishlist(${index})">⋯ Delete</button>` : ""}
+        <div class="top-row">
+          <div>
+            ${selectMode ? `<input class="checkbox" type="checkbox" onchange="toggleSelect('wishlist', ${i})">` : ""}
+            <strong>${e.title}</strong>
+          </div>
+          ${!selectMode ? `<span class="dot" onclick="toggleMenu('x${i}')">⋯</span>` : ""}
+        </div>
+
+        <div id="x${i}" class="menu">
+          <button onclick="deleteWishlist(${i})">Delete</button>
+        </div>
+
+        Genre: ${e.genre}
       </div>
     `;
   });
@@ -164,6 +238,22 @@ function deleteSelected() {
 
   save();
   toggleSelectMode();
+}
+
+function sortWatched(type) {
+  if (type === "date")
+    watched.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  if (type === "rating")
+    watched.sort((a,b)=>b.rating-a.rating);
+
+  if (type === "alpha")
+    watched.sort((a,b)=>a.title.localeCompare(b.title));
+
+  if (type === "genre")
+    watched.sort((a,b)=>a.genre.localeCompare(b.genre));
+
+  render();
 }
 
 render();
