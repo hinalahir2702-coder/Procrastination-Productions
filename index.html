@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CineNova</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #111; color: white; }
+input, select, textarea, button {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: none;
+}
+button { background: #444; color: white; cursor:pointer; }
+.card {
+  background: #222;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+</style>
+</head>
+<body>
+
+<h2>🎬 CineNova</h2>
+
+<input id="title" placeholder="Title">
+
+<select id="type">
+  <option value="Movie">Movie</option>
+  <option value="Series">Series</option>
+</select>
+
+<select id="genre">
+  <option>Action</option>
+  <option>Drama</option>
+  <option>Comedy</option>
+  <option>Romance</option>
+  <option>Thriller</option>
+  <option>Sci-Fi</option>
+</select>
+
+<input id="rating" type="number" min="1" max="10" placeholder="Rating (1-10)">
+<input id="date" type="date">
+<textarea id="notes" placeholder="Notes"></textarea>
+
+<button onclick="addWatched()">Add to Watched</button>
+<button onclick="addWishlist()">Add to Wishlist</button>
+<button onclick="toggleSelectMode()">Select Mode</button>
+<button onclick="deleteSelected()">Delete Selected</button>
+
+<h3>Watched</h3>
+<div id="watchedList"></div>
+
+<h3>Wishlist</h3>
+<div id="wishlist"></div>
+
+<script>
+let watched = JSON.parse(localStorage.getItem("watched")) || [];
+let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+let selectMode = false;
+let selectedWatched = new Set();
+let selectedWishlist = new Set();
+
+function save() {
+  localStorage.setItem("watched", JSON.stringify(watched));
+  localStorage.setItem("wishlist", JSON.stringify(wishlist));
+}
+
+function getFormData() {
+  return {
+    title: document.getElementById("title").value,
+    type: document.getElementById("type").value,
+    genre: document.getElementById("genre").value,
+    rating: document.getElementById("rating").value,
+    date: document.getElementById("date").value,
+    notes: document.getElementById("notes").value
+  };
+}
+
+function addWatched() {
+  watched.push(getFormData());
+  save();
+  render();
+}
+
+function addWishlist() {
+  wishlist.push(getFormData());
+  save();
+  render();
+}
+
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  selectedWatched.clear();
+  selectedWishlist.clear();
+  render();
+}
+
+function render() {
+  let watchedDiv = document.getElementById("watchedList");
+  let wishDiv = document.getElementById("wishlist");
+
+  watchedDiv.innerHTML = "";
+  wishDiv.innerHTML = "";
+
+  watched.forEach((e, index) => {
+    watchedDiv.innerHTML += `
+      <div class="card">
+        ${selectMode ? `<input type="checkbox" onchange="toggleSelect('watched', ${index})">` : ""}
+        <strong>${e.title}</strong>
+        ${!selectMode ? `<button onclick="deleteWatched(${index})">⋯ Delete</button>` : ""}
+        <br>Rating: ${e.rating}/10
+      </div>
+    `;
+  });
+
+  wishlist.forEach((e, index) => {
+    wishDiv.innerHTML += `
+      <div class="card">
+        ${selectMode ? `<input type="checkbox" onchange="toggleSelect('wishlist', ${index})">` : ""}
+        <strong>${e.title}</strong>
+        ${!selectMode ? `<button onclick="deleteWishlist(${index})">⋯ Delete</button>` : ""}
+      </div>
+    `;
+  });
+}
+
+function toggleSelect(type, index) {
+  if (type === "watched") {
+    selectedWatched.has(index)
+      ? selectedWatched.delete(index)
+      : selectedWatched.add(index);
+  } else {
+    selectedWishlist.has(index)
+      ? selectedWishlist.delete(index)
+      : selectedWishlist.add(index);
+  }
+}
+
+function deleteWatched(index) {
+  if (confirm("Delete this item?")) {
+    watched.splice(index, 1);
+    save();
+    render();
+  }
+}
+
+function deleteWishlist(index) {
+  if (confirm("Delete this item?")) {
+    wishlist.splice(index, 1);
+    save();
+    render();
+  }
+}
+
+function deleteSelected() {
+  if (!confirm("Delete selected items?")) return;
+
+  watched = watched.filter((_, i) => !selectedWatched.has(i));
+  wishlist = wishlist.filter((_, i) => !selectedWishlist.has(i));
+
+  save();
+  toggleSelectMode();
+}
+
+render();
+</script>
+
+</body>
+</html>
