@@ -26,7 +26,7 @@ body {
   background-image: radial-gradient(circle at 0% 0%, rgba(167, 139, 250, 0.08) 0%, transparent 40%);
   color: var(--text);
   margin: 0;
-  padding: 20px 16px 120px; /* Extra bottom padding for the FAB */
+  padding: 20px 16px 120px;
 }
 
 /* Header */
@@ -43,12 +43,13 @@ body {
   color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 11px;
 }
 
-/* Filter Bar */
+/* Filter Bar - REINSTATED FULL CONTROLS */
 .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
 .filter-bar::-webkit-scrollbar { display: none; }
 .minimal-select {
   background: var(--card-bg); border: 1px solid var(--glass-border);
   color: var(--text-dim); padding: 8px 14px; border-radius: 12px; font-size: 12px;
+  min-width: 90px;
 }
 
 /* Modal */
@@ -76,27 +77,21 @@ input[type="date"] { display: block; -webkit-appearance: none; line-height: 48px
   background: var(--card-bg); border-radius: 20px; padding: 16px 18px;
   margin-bottom: 12px; border: 1px solid var(--glass-border);
   position: relative; cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-.card-info h3 { margin: 0; font-size: 17px; font-weight: 600; color: #eee; padding-right: 60px; }
+.card-info h3 { margin: 0; font-size: 17px; font-weight: 600; color: #eee; padding-right: 75px; }
 .tag { font-size: 9px; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 3px 7px; border-radius: 5px; text-transform: uppercase; margin-right: 4px; font-weight: 600; }
 
-/* The "Unlimited" Details Section */
+/* Infinite Scrollable Notes */
 .details {
-  display: none; /* Changed from max-height for better reliability with long text */
+  display: none; 
   margin-top: 15px; padding-top: 15px;
   border-top: 1px solid var(--glass-border);
 }
 .card.open .details { display: block; }
-
 .detail-item { font-size: 12px; margin-bottom: 6px; color: var(--text-dim); }
 .detail-item strong { color: var(--primary); }
-.notes-box { 
-  font-size: 14px; color: #d4d4d8; line-height: 1.6; 
-  white-space: pre-wrap; /* Respects your line breaks */
-  word-wrap: break-word;
-}
+.notes-box { font-size: 14px; color: #d4d4d8; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
 
 /* Controls */
 .card-controls { position: absolute; top: 16px; right: 12px; display: flex; align-items: center; gap: 12px; z-index: 5; }
@@ -105,7 +100,6 @@ input[type="date"] { display: block; -webkit-appearance: none; line-height: 48px
 .card-check:checked { opacity: 1; }
 .del-btn { background: none; border: none; color: var(--text-dim); font-size: 18px; opacity: 0.4; cursor: pointer; padding: 0; }
 
-/* Floating Button */
 .fab {
   position: fixed; bottom: 30px; right: 25px;
   width: 60px; height: 60px; border-radius: 20px;
@@ -136,10 +130,11 @@ input[type="date"] { display: block; -webkit-appearance: none; line-height: 48px
 </div>
 
 <div class="filter-bar">
-  <select id="fType" class="minimal-select" onchange="render()"><option value="all">Types</option><option>Movie</option><option>Series</option><option>Book</option></select>
-  <select id="fGenre" class="minimal-select" onchange="render()"><option value="all">Genres</option>
+  <select id="fType" class="minimal-select" onchange="render()"><option value="all">All Types</option><option>Movie</option><option>Series</option><option>Book</option></select>
+  <select id="fGenre" class="minimal-select" onchange="render()"><option value="all">All Genres</option>
     <option>Action</option><option>Drama</option><option>Comedy</option><option>Romance</option><option>Thriller</option><option>Sci-Fi</option><option>Horror</option><option>Mystery</option><option>Superhero</option><option>Spy</option><option>FamilyDrama</option><option>Fantasy</option><option>Animation</option><option>Cartoon</option><option>Documentary</option><option>Biography</option><option>Travel</option><option>Musical</option><option>Crime</option><option>RealityShow</option><option>GameShow</option><option>TalkShow</option>
   </select>
+  <select id="fSort" class="minimal-select" onchange="render()"><option value="newest">Newest</option><option value="alpha">A-Z</option></select>
 </div>
 
 <div id="watchedList"></div>
@@ -170,9 +165,8 @@ input[type="date"] { display: block; -webkit-appearance: none; line-height: 48px
 <button class="fab" onclick="document.getElementById('addOverlay').style.display='flex'">+</button>
 
 <script>
-// Key updated to v5 to ensure fresh layout rendering
-let items = JSON.parse(localStorage.getItem("proc_prod_v5")) || { watched: [], wishlist: [] };
-function save() { localStorage.setItem("proc_prod_v5", JSON.stringify(items)); }
+let items = JSON.parse(localStorage.getItem("proc_prod_vfinal")) || { watched: [], wishlist: [] };
+function save() { localStorage.setItem("proc_prod_vfinal", JSON.stringify(items)); }
 
 function addItem(list) {
   const title = document.getElementById('title').value;
@@ -225,16 +219,21 @@ function deleteBulk() {
 function render() {
   const fType = document.getElementById('fType').value;
   const fGenre = document.getElementById('fGenre').value;
+  const fSort = document.getElementById('fSort').value;
 
   ['watched', 'wishlist'].forEach(list => {
     const div = document.getElementById(list + 'List');
     div.innerHTML = `<div class="section-label">${list}</div>`;
+    
     let filtered = items[list].filter(i => (fType === 'all' || i.type === fType) && (fGenre === 'all' || i.genre === fGenre));
     
+    // REINSTATED SORTING LOGIC
+    if(fSort === 'alpha') filtered.sort((a,b) => a.title.localeCompare(b.title));
+    else filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
     filtered.forEach(item => {
       const card = document.createElement('div');
       card.className = 'card';
-      // Toggle 'open' class on click
       card.onclick = function() { this.classList.toggle('open'); };
       
       card.innerHTML = `
@@ -252,7 +251,7 @@ function render() {
           </div>
           <div class="details">
             <div class="detail-item"><strong>Log Date:</strong> ${item.date}</div>
-            <div class="detail-item"><strong>Full Notes:</strong></div>
+            <div class="detail-item"><strong>Notes:</strong></div>
             <div class="notes-box">${item.notes}</div>
           </div>
         </div>
