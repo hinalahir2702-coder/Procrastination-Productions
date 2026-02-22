@@ -1,261 +1,312 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>CineNova Tracker - Mobile App Dark UI</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CineNova Tracker Pro</title>
 <style>
-body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background: #121212;
-  color: #f0f0f0;
-  margin: 0;
-  padding: 0;
-}
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
-h2 {
-  margin-top: 25px;
-  font-size: 24px;
-  font-weight: 700;
-  color: #ffffff;
+:root {
+  --primary: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #f8fafc;
+  --text-dim: #94a3b8;
 }
 
-/* Inputs and selects */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding-bottom: 50px;
+}
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 16px;
+}
+
+h2 { font-size: 1.25rem; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+
+/* Input Group */
+.form-group {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+}
+
 input, select, textarea {
   width: 100%;
   font-size: 16px;
-  padding: 14px;
-  margin: 10px 0;
-  border-radius: 12px;
-  border: none;
-  background: #1e1e1e;
-  color: #f0f0f0;
-}
-input:focus, select:focus, textarea:focus {
-  outline: 2px solid #3b82f6;
-}
-
-/* Buttons */
-button {
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  transition: 0.2s;
-}
-button:hover { opacity: 0.85; }
-.primary { background: #3b82f6; color: #fff; width: 48%; margin-right:4%; }
-.success { background: #10b981; color: #fff; width: 48%; margin-left:4%; }
-.danger  { background: #ef4444; color: #fff; }
-.secondary { background: #64748b; color: #fff; }
-
-/* Filter & Delete selected buttons */
-.filter-box select, .filter-box button {
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-  font-size: 15px;
-}
-.filter-box button { width: 48%; margin-right:4%; }
-
-/* Cards */
-.card {
-  position: relative;
-  background: #1e1e1e;
-  padding: 15px 15px 15px 50px;
-  margin: 15px 0;
-  border-radius: 16px;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-  font-size: 16px;
-  display: flex;
-  align-items: flex-start;
-}
-.card-content { flex: 1; }
-.card input[type="checkbox"] {
-  position: absolute;
-  left: 15px;
-  top: 20px;
-  transform: scale(1.5);
-}
-.card .delete-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #ef4444;
-  color: white;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  font-size: 18px;
-  padding: 0;
-  border: none;
-  cursor: pointer;
-}
-.card .move-btn {
-  background: #10b981;
-  color: white;
-  font-size: 14px;
-  padding: 4px 8px;
+  padding: 12px;
+  margin: 8px 0;
   border-radius: 10px;
-  margin-left: 5px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #fff;
+  box-sizing: border-box;
 }
 
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  h2 { font-size: 20px; }
-  input, select, textarea, button { font-size: 16px; padding: 12px; }
-  .card { font-size: 16px; padding: 18px 18px 18px 50px; }
+.btn-row { display: flex; gap: 10px; margin-top: 10px; }
+button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 0.1s;
+  color: white;
 }
+button:active { transform: scale(0.98); }
+
+.btn-primary { background: var(--primary); }
+.btn-success { background: var(--success); }
+.btn-danger { background: var(--danger); }
+.btn-outline { background: transparent; border: 1px solid var(--text-dim); color: var(--text-dim); }
+
+/* Control Bar (Sort & Filter) */
+.controls {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* List Cards */
+.card {
+  background: var(--card-bg);
+  margin-bottom: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #334155;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary);
+}
+
+.card-content { flex: 1; }
+.card-content strong { font-size: 1.1rem; display: block; margin-bottom: 4px; }
+.card-content small { color: var(--text-dim); display: block; margin-top: 2px; }
+
+.rating-tag {
+  background: #fbbf24;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+.type-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.card-actions { display: flex; flex-direction: column; gap: 8px; }
+.mini-btn { padding: 8px; border-radius: 8px; font-size: 12px; width: 40px;}
+
 </style>
 </head>
 <body>
+
 <div class="container">
+  <h1 style="text-align: center; color: var(--primary);">CineNova Tracker</h1>
 
-<h2>Add Media</h2>
-<input id="title" placeholder="Title">
-<select id="type">
-  <option>Movie</option>
-  <option>Series</option>
-  <option>Book</option>
-</select>
-<select id="genre">
-  <option value="">Select Genre</option>
-  <option>Action</option>
-  <option>Drama</option>
-  <option>Comedy</option>
-  <option>Romance</option>
-  <option>Thriller</option>
-  <option>Sci-Fi</option>
-  <option>Horror</option>
-  <option>Mystery</option>
-  <option>Superhero</option>
-  <option>Spy</option>
-  <option>FamilyDrama</option>
-  <option>Fantasy</option>
-  <option>Animation</option>
-  <option>Cartoon</option>
-  <option>Documentary</option>
-  <option>Biography</option>
-  <option>Travel</option>
-  <option>Musical</option>
-  <option>Crime</option>
-  <option>RealityShow</option>
-  <option>GameShow</option>
-  <option>TalkShow</option>
-</select>
-<input id="rating" type="number" placeholder="Rating (1-10)">
-<input id="date" type="date">
-<textarea id="notes" placeholder="Notes"></textarea>
+  <div class="form-group">
+    <input id="title" placeholder="Title (e.g. Inception)">
+    <div style="display:flex; gap:8px;">
+      <select id="type">
+        <option>Movie</option>
+        <option>Series</option>
+        <option>Book</option>
+      </select>
+      <select id="genre">
+        <option value="">Genre</option>
+        <option>Action</option><option>Drama</option><option>Comedy</option>
+        <option>Sci-Fi</option><option>Horror</option><option>Fantasy</option>
+        <option>Documentary</option><option>Crime</option>
+      </select>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <input id="rating" type="number" placeholder="Rating 1-10">
+      <input id="date" type="date">
+    </div>
+    <textarea id="notes" placeholder="Personal notes..."></textarea>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="addItem('watched')">+ Watched</button>
+      <button class="btn-success" onclick="addItem('wishlist')">+ Wishlist</button>
+    </div>
+  </div>
 
-<button class="primary" onclick="addWatched()">Add Watched</button>
-<button class="success" onclick="addWishlist()">Add Wishlist</button>
+  <div class="controls">
+    <select onchange="applyFilters('type', this.value)">
+      <option value="all">All Types</option>
+      <option>Movie</option><option>Series</option><option>Book</option>
+    </select>
+    <select id="sortSelect" onchange="applySort(this.value)">
+      <option value="date">Newest Date</option>
+      <option value="alpha">A-Z Title</option>
+      <option value="rating">Highest Rating</option>
+      <option value="type">By Type</option>
+      <option value="genre">By Genre</option>
+    </select>
+  </div>
 
-<div class="filter-box">
-<h2>Filters</h2>
-<select onchange="setTimeFilter(this.value)">
-  <option value="">All Time</option>
-  <option value="thisYear">This Year</option>
-  <option value="lastMonth">Last Month</option>
-</select>
-<select onchange="setGenreFilter(this.value)">
-  <option value="all">All Genres</option>
-  <option>Action</option>
-  <option>Drama</option>
-  <option>Comedy</option>
-  <option>Romance</option>
-  <option>Thriller</option>
-  <option>Sci-Fi</option>
-  <option>Horror</option>
-  <option>Mystery</option>
-  <option>Superhero</option>
-  <option>Spy</option>
-  <option>FamilyDrama</option>
-  <option>Fantasy</option>
-  <option>Animation</option>
-  <option>Cartoon</option>
-  <option>Documentary</option>
-  <option>Biography</option>
-  <option>Travel</option>
-  <option>Musical</option>
-  <option>Crime</option>
-  <option>RealityShow</option>
-  <option>GameShow</option>
-  <option>TalkShow</option>
-</select>
-<select onchange="setTypeFilter(this.value)">
-  <option value="all">All Types</option>
-  <option>Movie</option>
-  <option>Series</option>
-  <option>Book</option>
-</select>
-<button class="secondary" onclick="sortWatched('date')">Sort</button>
+  <div class="btn-row" style="margin-bottom: 20px;">
+    <button class="btn-danger" style="padding: 10px;" onclick="deleteBulk()">Delete Selected Items</button>
+  </div>
+
+  <h2>🎬 Watched</h2>
+  <div id="watchedList"></div>
+
+  <h2>📌 Wishlist</h2>
+  <div id="wishlistList"></div>
 </div>
 
-<button class="danger" onclick="deleteSelected('watched')">Delete Selected Watched</button>
-<button class="danger" onclick="deleteSelected('wishlist')">Delete Selected Wishlist</button>
-
-<h2>Watched</h2>
-<div id="watchedList"></div>
-
-<h2>Wishlist</h2>
-<div id="wishlistList"></div>
-
 <script>
-// Data
-let watched = JSON.parse(localStorage.getItem("watched")) || [];
-let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
-let timeFilter="", genreFilter="", typeFilter="";
+let data = {
+  watched: JSON.parse(localStorage.getItem("watched")) || [],
+  wishlist: JSON.parse(localStorage.getItem("wishlist")) || []
+};
 
-function save() { localStorage.setItem("watched", JSON.stringify(watched)); localStorage.setItem("wishlist", JSON.stringify(wishlist)); }
-function getFormData(){ return { title: title.value, type: type.value, genre: genre.value, rating: rating.value, date: date.value, notes: notes.value }; }
-function clearForm(){ title.value=""; genre.value=""; rating.value=""; date.value=""; notes.value=""; }
-function addWatched(){ watched.push(getFormData()); save(); render(); clearForm(); }
-function addWishlist(){ wishlist.push(getFormData()); save(); render(); clearForm(); }
-function deleteWatched(i){ if(confirm("Delete this item?")){ watched.splice(i,1); save(); render(); } }
-function deleteWishlist(i){ if(confirm("Delete this item?")){ wishlist.splice(i,1); save(); render(); } }
-function moveToWatched(i){ if(confirm("Move to Watched?")){ watched.push(wishlist[i]); wishlist.splice(i,1); save(); render(); } }
-function setTimeFilter(v){ timeFilter=v; render(); }
-function setGenreFilter(v){ genreFilter=v.toLowerCase(); render(); }
-function setTypeFilter(v){ typeFilter=v.toLowerCase(); render(); }
-function sortWatched(type){ if(type==="date") watched.sort((a,b)=>new Date(b.date)-new Date(a.date)); if(type==="rating") watched.sort((a,b)=>b.rating-a.rating); if(type==="alpha") watched.sort((a,b)=>a.title.localeCompare(b.title)); if(type==="genre") watched.sort((a,b)=>a.genre.localeCompare(b.genre)); if(type==="type") watched.sort((a,b)=>a.type.localeCompare(b.type)); render(); }
+let currentFilters = { type: 'all' };
 
-function deleteSelected(listType){
-  let items = listType==="watched"?watched:wishlist;
-  let checkboxes = document.querySelectorAll(`#${listType}List input[type="checkbox"]:checked`);
-  if(checkboxes.length===0){ alert("Select at least one item."); return; }
-  if(confirm("Delete selected items?")){
-    let indexes = Array.from(checkboxes).map(cb=>parseInt(cb.dataset.index)).sort((a,b)=>b-a);
-    indexes.forEach(i=>items.splice(i,1));
-    save(); render();
+function save() {
+  localStorage.setItem("watched", JSON.stringify(data.watched));
+  localStorage.setItem("wishlist", JSON.stringify(data.wishlist));
+}
+
+function addItem(list) {
+  const titleVal = document.getElementById('title').value;
+  if(!titleVal) return alert("Please enter a title");
+  
+  const item = {
+    id: Date.now(), // Unique ID for better tracking
+    title: titleVal,
+    type: document.getElementById('type').value,
+    genre: document.getElementById('genre').value || 'Other',
+    rating: document.getElementById('rating').value || '0',
+    date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+    notes: document.getElementById('notes').value
+  };
+
+  data[list].unshift(item);
+  save();
+  render();
+  // Clear form
+  ['title', 'rating', 'date', 'notes'].forEach(id => document.getElementById(id).value = "");
+}
+
+function deleteSingle(list, id) {
+  if(confirm("Remove this item?")) {
+    data[list] = data[list].filter(item => item.id !== id);
+    save();
+    render();
   }
 }
 
-function render(){
-  const watchedDiv=document.getElementById("watchedList");
-  const wishlistDiv=document.getElementById("wishlistList");
-  watchedDiv.innerHTML=""; wishlistDiv.innerHTML="";
-  let filtered = watched.filter(e=>{
-    let match=true;
-    if(timeFilter==="thisYear") match=match&&e.date&&new Date(e.date).getFullYear()===new Date().getFullYear();
-    if(timeFilter==="lastMonth"){ let today=new Date(); let lastMonth=new Date(today.getFullYear(),today.getMonth()-1); let d=new Date(e.date); match=match&&d.getMonth()===lastMonth.getMonth()&&d.getFullYear()===lastMonth.getFullYear();}
-    if(genreFilter&&genreFilter!=="all") match=match&&e.genre.toLowerCase()===genreFilter;
-    if(typeFilter&&typeFilter!=="all") match=match&&e.type.toLowerCase()===typeFilter;
-    return match;
-  });
-  filtered.forEach((e,i)=>{
-    watchedDiv.innerHTML+=`<div class="card"><input type="checkbox" data-index="${i}"><div class="card-content"><strong>${e.title}</strong><br>Type: ${e.type}<br>Genre: ${e.genre}<br>Rating: ${e.rating}/10<br>Date: ${e.date}<br>Notes: ${e.notes}</div><button class="delete-btn" onclick="deleteWatched(${i})">×</button></div>`;
-  });
-  wishlist.forEach((e,i)=>{
-    wishlistDiv.innerHTML+=`<div class="card"><input type="checkbox" data-index="${i}"><div class="card-content"><strong>${e.title}</strong><br>Type: ${e.type}<br>Genre: ${e.genre}<br>Rating: ${e.rating}/10<br>Date: ${e.date}<br>Notes: ${e.notes}</div><button class="move-btn" onclick="moveToWatched(${i})">→</button><button class="delete-btn" onclick="deleteWishlist(${i})">×</button></div>`;
+function moveWishToWatched(id) {
+  const idx = data.wishlist.findIndex(item => item.id === id);
+  const item = data.wishlist.splice(idx, 1)[0];
+  data.watched.unshift(item);
+  save();
+  render();
+}
+
+function deleteBulk() {
+  const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+  if(checked.length === 0) return alert("Select items first");
+  
+  if(confirm(`Delete ${checked.length} items?`)) {
+    checked.forEach(cb => {
+      const id = parseInt(cb.value);
+      data.watched = data.watched.filter(i => i.id !== id);
+      data.wishlist = data.wishlist.filter(i => i.id !== id);
+    });
+    save();
+    render();
+  }
+}
+
+function applySort(criteria) {
+  const sorter = (a, b) => {
+    if(criteria === 'date') return new Date(b.date) - new Date(a.date);
+    if(criteria === 'rating') return b.rating - a.rating;
+    if(criteria === 'alpha') return a.title.localeCompare(b.title);
+    if(criteria === 'type') return a.type.localeCompare(b.type);
+    if(criteria === 'genre') return a.genre.localeCompare(b.genre);
+  };
+  data.watched.sort(sorter);
+  data.wishlist.sort(sorter);
+  render();
+}
+
+function applyFilters(key, val) {
+  currentFilters[key] = val;
+  render();
+}
+
+function render() {
+  ['watched', 'wishlist'].forEach(listName => {
+    const container = document.getElementById(`${listName}List`);
+    container.innerHTML = "";
+    
+    let filtered = data[listName].filter(item => {
+      return currentFilters.type === 'all' || item.type === currentFilters.type;
+    });
+
+    filtered.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="checkbox-wrapper">
+          <input type="checkbox" value="${item.id}">
+        </div>
+        <div class="card-content">
+          <span class="type-tag">${item.type}</span>
+          <strong>${item.title} ${item.rating ? `<span class="rating-tag">★ ${item.rating}</span>` : ''}</strong>
+          <small>${item.genre} • ${item.date}</small>
+          ${item.notes ? `<small style="font-style:italic; color:#64748b; margin-top:5px;">"${item.notes}"</small>` : ''}
+        </div>
+        <div class="card-actions">
+          <button class="btn-danger mini-btn" onclick="deleteSingle('${listName}', ${item.id})">✕</button>
+          ${listName === 'wishlist' ? `<button class="btn-success mini-btn" onclick="moveWishToWatched(${item.id})">✓</button>` : ''}
+        </div>
+      `;
+      container.appendChild(card);
+    });
   });
 }
+
+// Initial Render
 render();
 </script>
-</div>
+
 </body>
 </html>
