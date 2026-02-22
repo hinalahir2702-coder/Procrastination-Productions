@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CineNova Tracker Pro</title>
+<title>CineNova Tracker Elite</title>
 <style>
 :root {
   --primary: #3b82f6;
@@ -20,127 +20,83 @@ body {
   background: var(--bg);
   color: var(--text);
   margin: 0;
-  padding-bottom: 50px;
+  padding-bottom: 80px;
 }
 
-.container {
-  max-width: 500px;
-  margin: auto;
-  padding: 16px;
-}
+.container { max-width: 500px; margin: auto; padding: 16px; }
 
-h2 { font-size: 1.25rem; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
-
-/* Input Group */
+/* Input Section */
 .form-group {
   background: var(--card-bg);
-  padding: 20px;
+  padding: 18px;
   border-radius: 20px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
   margin-bottom: 20px;
 }
 
 input, select, textarea {
-  width: 100%;
-  font-size: 16px;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 10px;
-  border: 1px solid #334155;
-  background: #0f172a;
-  color: #fff;
-  box-sizing: border-box;
+  width: 100%; font-size: 16px; padding: 12px; margin: 6px 0;
+  border-radius: 10px; border: 1px solid #334155;
+  background: #0f172a; color: #fff; box-sizing: border-box;
 }
 
-.btn-row { display: flex; gap: 10px; margin-top: 10px; }
+.btn-row { display: flex; gap: 8px; margin-top: 10px; }
 button {
-  flex: 1;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  font-size: 14px;
-  transition: transform 0.1s;
-  color: white;
+  flex: 1; padding: 14px; border-radius: 12px; border: none;
+  font-weight: 700; cursor: pointer; color: white; transition: 0.2s;
 }
-button:active { transform: scale(0.98); }
-
 .btn-primary { background: var(--primary); }
 .btn-success { background: var(--success); }
-.btn-danger { background: var(--danger); }
-.btn-outline { background: transparent; border: 1px solid var(--text-dim); color: var(--text-dim); }
+.btn-danger { background: var(--danger); width: 100%; margin-top: 10px;}
 
-/* Control Bar (Sort & Filter) */
-.controls {
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  z-index: 10;
-  padding: 10px 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+/* Filter/Sort Section */
+.filter-panel {
+  background: #1e293b80;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  border: 1px dashed #475569;
 }
 
-/* List Cards */
+.filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* Card UI */
 .card {
   background: var(--card-bg);
   margin-bottom: 12px;
-  padding: 16px;
+  padding: 15px;
   border-radius: 16px;
   display: flex;
-  align-items: center;
   gap: 12px;
-  border: 1px solid #334155;
+  border-left: 5px solid var(--primary);
+  position: relative;
 }
 
-.checkbox-wrapper {
-  display: flex;
-  align-items: center;
-}
+.card.wishlist-border { border-left-color: var(--success); }
 
-input[type="checkbox"] {
-  width: 22px;
-  height: 22px;
-  accent-color: var(--primary);
-}
+.checkbox-col { display: flex; align-items: flex-start; padding-top: 4px; }
+input[type="checkbox"] { width: 20px; height: 20px; }
 
-.card-content { flex: 1; }
-.card-content strong { font-size: 1.1rem; display: block; margin-bottom: 4px; }
-.card-content small { color: var(--text-dim); display: block; margin-top: 2px; }
+.card-info { flex: 1; }
+.card-info h3 { margin: 0; font-size: 1.1rem; }
+.tags { display: flex; gap: 5px; margin: 5px 0; flex-wrap: wrap; }
+.tag { font-size: 10px; background: #334155; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+.rating-pill { background: #fbbf24; color: #000; font-weight: bold; padding: 2px 6px; border-radius: 5px; font-size: 11px; }
 
-.rating-tag {
-  background: #fbbf24;
-  color: #000;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: bold;
-  font-size: 12px;
-  margin-left: 8px;
-}
+.card-actions { display: flex; flex-direction: column; gap: 5px; }
+.action-btn { width: 35px; height: 35px; border-radius: 8px; font-size: 18px; line-height: 1; }
 
-.type-tag {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: #475569;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.card-actions { display: flex; flex-direction: column; gap: 8px; }
-.mini-btn { padding: 8px; border-radius: 8px; font-size: 12px; width: 40px;}
-
+h2 { border-bottom: 1px solid #334155; padding-bottom: 10px; margin-top: 30px; }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1 style="text-align: center; color: var(--primary);">CineNova Tracker</h1>
+  <h1 style="text-align:center; margin: 10px 0;">CineNova <span style="color:var(--primary)">Tracker</span></h1>
 
   <div class="form-group">
-    <input id="title" placeholder="Title (e.g. Inception)">
-    <div style="display:flex; gap:8px;">
+    <input id="title" placeholder="Title">
+    <div class="filter-grid">
       <select id="type">
         <option>Movie</option>
         <option>Series</option>
@@ -149,164 +105,184 @@ input[type="checkbox"] {
       <select id="genre">
         <option value="">Genre</option>
         <option>Action</option><option>Drama</option><option>Comedy</option>
-        <option>Sci-Fi</option><option>Horror</option><option>Fantasy</option>
-        <option>Documentary</option><option>Crime</option>
+        <option>Romance</option><option>Thriller</option><option>Sci-Fi</option>
+        <option>Horror</option><option>Mystery</option><option>Superhero</option>
+        <option>Spy</option><option>FamilyDrama</option><option>Fantasy</option>
+        <option>Animation</option><option>Cartoon</option><option>Documentary</option>
+        <option>Biography</option><option>Travel</option><option>Musical</option>
+        <option>Crime</option><option>RealityShow</option><option>GameShow</option>
+        <option>TalkShow</option>
       </select>
     </div>
-    <div style="display:flex; gap:8px;">
-      <input id="rating" type="number" placeholder="Rating 1-10">
+    <div class="filter-grid">
+      <input id="rating" type="number" placeholder="Rating (1-10)">
       <input id="date" type="date">
     </div>
-    <textarea id="notes" placeholder="Personal notes..."></textarea>
+    <textarea id="notes" placeholder="Notes..."></textarea>
     <div class="btn-row">
       <button class="btn-primary" onclick="addItem('watched')">+ Watched</button>
       <button class="btn-success" onclick="addItem('wishlist')">+ Wishlist</button>
     </div>
   </div>
 
-  <div class="controls">
-    <select onchange="applyFilters('type', this.value)">
-      <option value="all">All Types</option>
-      <option>Movie</option><option>Series</option><option>Book</option>
-    </select>
-    <select id="sortSelect" onchange="applySort(this.value)">
-      <option value="date">Newest Date</option>
-      <option value="alpha">A-Z Title</option>
-      <option value="rating">Highest Rating</option>
-      <option value="type">By Type</option>
-      <option value="genre">By Genre</option>
-    </select>
+  <div class="filter-panel">
+    <div style="font-weight:bold; font-size: 12px; color:var(--text-dim); margin-bottom:8px;">COMPOUND FILTERS & SORTING</div>
+    <div class="filter-grid">
+      <select id="fType" onchange="render()">
+        <option value="all">All Types</option>
+        <option>Movie</option><option>Series</option><option>Book</option>
+      </select>
+      <select id="fGenre" onchange="render()">
+        <option value="all">All Genres</option>
+        <option>Action</option><option>Drama</option><option>Comedy</option><option>Romance</option><option>Thriller</option><option>Sci-Fi</option><option>Horror</option><option>Mystery</option><option>Superhero</option><option>Spy</option><option>FamilyDrama</option><option>Fantasy</option><option>Animation</option><option>Cartoon</option><option>Documentary</option><option>Biography</option><option>Travel</option><option>Musical</option><option>Crime</option><option>RealityShow</option><option>GameShow</option><option>TalkShow</option>
+      </select>
+      <select id="fTime" onchange="render()">
+        <option value="all">All Time</option>
+        <option value="thisYear">This Year</option>
+        <option value="thisMonth">This Month</option>
+      </select>
+      <select id="fSort" onchange="render()">
+        <option value="newest">Newest Date</option>
+        <option value="oldest">Oldest Date</option>
+        <option value="alpha">A-Z Title</option>
+        <option value="rating">Top Rated</option>
+      </select>
+    </div>
+    <button class="btn-danger" onclick="deleteBulk()">Delete Selected</button>
   </div>
 
-  <div class="btn-row" style="margin-bottom: 20px;">
-    <button class="btn-danger" style="padding: 10px;" onclick="deleteBulk()">Delete Selected Items</button>
-  </div>
-
-  <h2>🎬 Watched</h2>
+  <h2>🍿 Watched</h2>
   <div id="watchedList"></div>
 
-  <h2>📌 Wishlist</h2>
+  <h2>📝 Wishlist</h2>
   <div id="wishlistList"></div>
 </div>
 
 <script>
 let data = {
-  watched: JSON.parse(localStorage.getItem("watched")) || [],
-  wishlist: JSON.parse(localStorage.getItem("wishlist")) || []
+  watched: JSON.parse(localStorage.getItem("watched_v2")) || [],
+  wishlist: JSON.parse(localStorage.getItem("wishlist_v2")) || []
 };
 
-let currentFilters = { type: 'all' };
-
 function save() {
-  localStorage.setItem("watched", JSON.stringify(data.watched));
-  localStorage.setItem("wishlist", JSON.stringify(data.wishlist));
+  localStorage.setItem("watched_v2", JSON.stringify(data.watched));
+  localStorage.setItem("wishlist_v2", JSON.stringify(data.wishlist));
 }
 
 function addItem(list) {
-  const titleVal = document.getElementById('title').value;
-  if(!titleVal) return alert("Please enter a title");
+  const title = document.getElementById('title').value;
+  if(!title) return alert("Enter a title");
   
   const item = {
-    id: Date.now(), // Unique ID for better tracking
-    title: titleVal,
+    id: Date.now(),
+    title: title,
     type: document.getElementById('type').value,
     genre: document.getElementById('genre').value || 'Other',
-    rating: document.getElementById('rating').value || '0',
+    rating: document.getElementById('rating').value || 0,
     date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
     notes: document.getElementById('notes').value
   };
 
-  data[list].unshift(item);
-  save();
-  render();
-  // Clear form
-  ['title', 'rating', 'date', 'notes'].forEach(id => document.getElementById(id).value = "");
+  data[list].push(item);
+  save(); render();
+  document.getElementById('title').value = "";
 }
 
 function deleteSingle(list, id) {
-  if(confirm("Remove this item?")) {
-    data[list] = data[list].filter(item => item.id !== id);
-    save();
-    render();
+  if(confirm("Remove this?")) {
+    data[list] = data[list].filter(i => i.id !== id);
+    save(); render();
   }
 }
 
-function moveWishToWatched(id) {
-  const idx = data.wishlist.findIndex(item => item.id === id);
+function moveToWatched(id) {
+  const idx = data.wishlist.findIndex(i => i.id === id);
   const item = data.wishlist.splice(idx, 1)[0];
-  data.watched.unshift(item);
-  save();
-  render();
+  data.watched.push(item);
+  save(); render();
 }
 
 function deleteBulk() {
   const checked = document.querySelectorAll('input[type="checkbox"]:checked');
   if(checked.length === 0) return alert("Select items first");
-  
   if(confirm(`Delete ${checked.length} items?`)) {
     checked.forEach(cb => {
       const id = parseInt(cb.value);
       data.watched = data.watched.filter(i => i.id !== id);
       data.wishlist = data.wishlist.filter(i => i.id !== id);
     });
-    save();
-    render();
+    save(); render();
   }
 }
 
-function applySort(criteria) {
-  const sorter = (a, b) => {
-    if(criteria === 'date') return new Date(b.date) - new Date(a.date);
-    if(criteria === 'rating') return b.rating - a.rating;
-    if(criteria === 'alpha') return a.title.localeCompare(b.title);
-    if(criteria === 'type') return a.type.localeCompare(b.type);
-    if(criteria === 'genre') return a.genre.localeCompare(b.genre);
-  };
-  data.watched.sort(sorter);
-  data.wishlist.sort(sorter);
-  render();
-}
+function getFilteredList(listName) {
+  const fType = document.getElementById('fType').value;
+  const fGenre = document.getElementById('fGenre').value;
+  const fTime = document.getElementById('fTime').value;
+  const fSort = document.getElementById('fSort').value;
 
-function applyFilters(key, val) {
-  currentFilters[key] = val;
-  render();
+  let filtered = data[listName].filter(item => {
+    let match = true;
+    if(fType !== 'all' && item.type !== fType) match = false;
+    if(fGenre !== 'all' && item.genre !== fGenre) match = false;
+    
+    if(fTime === 'thisYear') {
+      match = match && new Date(item.date).getFullYear() === new Date().getFullYear();
+    }
+    if(fTime === 'thisMonth') {
+      const d = new Date(item.date);
+      const now = new Date();
+      match = match && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }
+    return match;
+  });
+
+  // Apply Sorting
+  filtered.sort((a, b) => {
+    if(fSort === 'newest') return new Date(b.date) - new Date(a.date);
+    if(fSort === 'oldest') return new Date(a.date) - new Date(b.date);
+    if(fSort === 'alpha') return a.title.localeCompare(b.title);
+    if(fSort === 'rating') return b.rating - a.rating;
+    return 0;
+  });
+
+  return filtered;
 }
 
 function render() {
-  ['watched', 'wishlist'].forEach(listName => {
-    const container = document.getElementById(`${listName}List`);
-    container.innerHTML = "";
-    
-    let filtered = data[listName].filter(item => {
-      return currentFilters.type === 'all' || item.type === currentFilters.type;
-    });
+  ['watched', 'wishlist'].forEach(list => {
+    const listDiv = document.getElementById(`${list}List`);
+    listDiv.innerHTML = "";
+    const items = getFilteredList(list);
 
-    filtered.forEach(item => {
+    items.forEach(item => {
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = `card ${list === 'wishlist' ? 'wishlist-border' : ''}`;
       card.innerHTML = `
-        <div class="checkbox-wrapper">
+        <div class="checkbox-col">
           <input type="checkbox" value="${item.id}">
         </div>
-        <div class="card-content">
-          <span class="type-tag">${item.type}</span>
-          <strong>${item.title} ${item.rating ? `<span class="rating-tag">★ ${item.rating}</span>` : ''}</strong>
-          <small>${item.genre} • ${item.date}</small>
-          ${item.notes ? `<small style="font-style:italic; color:#64748b; margin-top:5px;">"${item.notes}"</small>` : ''}
+        <div class="card-info">
+          <h3>${item.title}</h3>
+          <div class="tags">
+            <span class="tag">${item.type}</span>
+            <span class="tag">${item.genre}</span>
+            ${item.rating > 0 ? `<span class="rating-pill">★ ${item.rating}</span>` : ''}
+          </div>
+          <div style="font-size:12px; color:var(--text-dim)">${item.date}</div>
+          ${item.notes ? `<div style="font-size:12px; margin-top:5px; opacity:0.8">${item.notes}</div>` : ''}
         </div>
         <div class="card-actions">
-          <button class="btn-danger mini-btn" onclick="deleteSingle('${listName}', ${item.id})">✕</button>
-          ${listName === 'wishlist' ? `<button class="btn-success mini-btn" onclick="moveWishToWatched(${item.id})">✓</button>` : ''}
+          <button class="btn-danger action-btn" onclick="deleteSingle('${list}', ${item.id})">×</button>
+          ${list === 'wishlist' ? `<button class="btn-success action-btn" onclick="moveToWatched(${item.id})">✓</button>` : ''}
         </div>
       `;
-      container.appendChild(card);
+      listDiv.appendChild(card);
     });
   });
 }
 
-// Initial Render
 render();
 </script>
-
 </body>
 </html>
