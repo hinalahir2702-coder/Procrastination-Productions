@@ -271,6 +271,9 @@ function sortWatched(type) {
   if (type === "genre")
     watched.sort((a,b)=>a.genre.localeCompare(b.genre));
 
+  if (type === "type")
+    watched.sort((a,b)=>a.genre.localeCompare(b.type));
+
   render();
 }
 
