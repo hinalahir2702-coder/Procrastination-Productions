@@ -192,9 +192,11 @@ function render() {
           <button onclick="deleteWatched(${i})">Delete</button>
         </div>
 
+        Type: ${e.type}<br>
         Rating: ${e.rating}/10<br>
         Date: ${e.date}<br>
-        Genre: ${e.genre}
+        Genre: ${e.genre}<br>
+        Notes: ${e.notes}
       </div>
     `;
   });
@@ -214,7 +216,9 @@ function render() {
           <button onclick="deleteWishlist(${i})">Delete</button>
         </div>
 
-        Genre: ${e.genre}
+        Type: ${e.type}<br>
+        Genre: ${e.genre}<br>
+        Notes: ${e.notes}
       </div>
     `;
   });
