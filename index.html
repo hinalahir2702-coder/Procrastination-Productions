@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>CineNova Tracker - Multi Delete</title>
-
+<title>CineNova Tracker - Mobile App Dark UI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body {
   font-family: "Helvetica Neue", Arial, sans-serif;
@@ -13,13 +11,11 @@ body {
   margin: 0;
   padding: 0;
 }
-
 .container {
   max-width: 600px;
   margin: auto;
   padding: 20px;
 }
-
 h2 {
   margin-top: 25px;
   font-size: 24px;
@@ -27,6 +23,7 @@ h2 {
   color: #ffffff;
 }
 
+/* Inputs and selects */
 input, select, textarea {
   width: 100%;
   font-size: 16px;
@@ -37,15 +34,12 @@ input, select, textarea {
   background: #1e1e1e;
   color: #f0f0f0;
 }
-
 input:focus, select:focus, textarea:focus {
   outline: 2px solid #3b82f6;
 }
 
+/* Buttons */
 button {
-  width: 100%;
-  padding: 16px;
-  margin: 10px 0;
   font-size: 16px;
   font-weight: 600;
   border-radius: 12px;
@@ -53,31 +47,41 @@ button {
   cursor: pointer;
   transition: 0.2s;
 }
-
-.primary { background: #3b82f6; color: white; }
-.success { background: #10b981; color: white; }
-.danger  { background: #ef4444; color: white; }
-.secondary { background: #64748b; color: white; }
-
 button:hover { opacity: 0.85; }
+.primary { background: #3b82f6; color: #fff; width: 48%; margin-right:4%; }
+.success { background: #10b981; color: #fff; width: 48%; margin-left:4%; }
+.danger  { background: #ef4444; color: #fff; }
+.secondary { background: #64748b; color: #fff; }
+
+/* Filter & Delete selected buttons */
+.filter-box select, .filter-box button {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+}
+.filter-box button { width: 48%; margin-right:4%; }
 
 /* Cards */
 .card {
   position: relative;
   background: #1e1e1e;
-  padding: 20px;
+  padding: 15px 15px 15px 50px;
   margin: 15px 0;
   border-radius: 16px;
   box-shadow: 0 6px 12px rgba(0,0,0,0.5);
   font-size: 16px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
-
-.card-content {
-  flex: 1;
+.card-content { flex: 1; }
+.card input[type="checkbox"] {
+  position: absolute;
+  left: 15px;
+  top: 20px;
+  transform: scale(1.5);
 }
-
 .card .delete-btn {
   position: absolute;
   top: 10px;
@@ -92,38 +96,24 @@ button:hover { opacity: 0.85; }
   border: none;
   cursor: pointer;
 }
-
-.card input[type="checkbox"] {
-  margin-right: 12px;
-  transform: scale(1.5);
+.card .move-btn {
+  background: #10b981;
+  color: white;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  margin-left: 5px;
 }
 
-/* Filters Box */
-.filter-box {
-  background: #1e1e1e;
-  padding: 20px;
-  border-radius: 16px;
-  margin: 20px 0;
-  font-size: 16px;
-}
-
-/* Sort buttons */
-.sort-buttons button {
-  width: 48%;
-  display: inline-block;
-  margin-right: 4%;
-}
-.sort-buttons button:nth-child(2n) { margin-right: 0; }
-
+/* Responsive adjustments */
 @media (max-width: 480px) {
   h2 { font-size: 20px; }
-  input, select, textarea, button { font-size: 16px; padding: 14px; }
-  .card { font-size: 16px; padding: 18px; }
+  input, select, textarea, button { font-size: 16px; padding: 12px; }
+  .card { font-size: 16px; padding: 18px 18px 18px 50px; }
 }
 </style>
 </head>
 <body>
-
 <div class="container">
 
 <h2>Add Media</h2>
@@ -162,8 +152,8 @@ button:hover { opacity: 0.85; }
 <input id="date" type="date">
 <textarea id="notes" placeholder="Notes"></textarea>
 
-<button class="primary" onclick="addWatched()">Add to Watched</button>
-<button class="success" onclick="addWishlist()">Add to Wishlist</button>
+<button class="primary" onclick="addWatched()">Add Watched</button>
+<button class="success" onclick="addWishlist()">Add Wishlist</button>
 
 <div class="filter-box">
 <h2>Filters</h2>
@@ -203,32 +193,20 @@ button:hover { opacity: 0.85; }
   <option>Series</option>
   <option>Book</option>
 </select>
-<p id="watchedCount"></p>
-</div>
-
-<h2>Sort</h2>
-<div class="sort-buttons">
-  <button class="secondary" onclick="sortWatched('date')">By Date</button>
-  <button class="secondary" onclick="sortWatched('rating')">By Rating</button>
-  <button class="secondary" onclick="sortWatched('alpha')">Alphabetical</button>
-  <button class="secondary" onclick="sortWatched('genre')">By Genre</button>
-  <button class="secondary" onclick="sortWatched('type')">By Type</button>
+<button class="secondary" onclick="sortWatched('date')">Sort</button>
 </div>
 
 <button class="danger" onclick="deleteSelected('watched')">Delete Selected Watched</button>
 <button class="danger" onclick="deleteSelected('wishlist')">Delete Selected Wishlist</button>
 
-<div class="section">
 <h2>Watched</h2>
 <div id="watchedList"></div>
-</div>
 
-<div class="section">
 <h2>Wishlist</h2>
 <div id="wishlistList"></div>
-</div>
 
 <script>
+// Data
 let watched = JSON.parse(localStorage.getItem("watched")) || [];
 let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 let timeFilter="", genreFilter="", typeFilter="";
@@ -238,49 +216,46 @@ function getFormData(){ return { title: title.value, type: type.value, genre: ge
 function clearForm(){ title.value=""; genre.value=""; rating.value=""; date.value=""; notes.value=""; }
 function addWatched(){ watched.push(getFormData()); save(); render(); clearForm(); }
 function addWishlist(){ wishlist.push(getFormData()); save(); render(); clearForm(); }
-function deleteWatched(index){ if(confirm("Delete this item from Watched?")){ watched.splice(index,1); save(); render(); } }
-function deleteWishlist(index){ if(confirm("Delete this item from Wishlist?")){ wishlist.splice(index,1); save(); render(); } }
-function moveToWatched(index){ if(confirm("Move this to Watched?")){ watched.push(wishlist[index]); wishlist.splice(index,1); save(); render(); } }
-function setTimeFilter(value){ timeFilter=value; render(); }
-function setGenreFilter(value){ genreFilter=value.toLowerCase(); render(); }
-function setTypeFilter(value){ typeFilter=value.toLowerCase(); render(); }
+function deleteWatched(i){ if(confirm("Delete this item?")){ watched.splice(i,1); save(); render(); } }
+function deleteWishlist(i){ if(confirm("Delete this item?")){ wishlist.splice(i,1); save(); render(); } }
+function moveToWatched(i){ if(confirm("Move to Watched?")){ watched.push(wishlist[i]); wishlist.splice(i,1); save(); render(); } }
+function setTimeFilter(v){ timeFilter=v; render(); }
+function setGenreFilter(v){ genreFilter=v.toLowerCase(); render(); }
+function setTypeFilter(v){ typeFilter=v.toLowerCase(); render(); }
 function sortWatched(type){ if(type==="date") watched.sort((a,b)=>new Date(b.date)-new Date(a.date)); if(type==="rating") watched.sort((a,b)=>b.rating-a.rating); if(type==="alpha") watched.sort((a,b)=>a.title.localeCompare(b.title)); if(type==="genre") watched.sort((a,b)=>a.genre.localeCompare(b.genre)); if(type==="type") watched.sort((a,b)=>a.type.localeCompare(b.type)); render(); }
 
 function deleteSelected(listType){
   let items = listType==="watched"?watched:wishlist;
   let checkboxes = document.querySelectorAll(`#${listType}List input[type="checkbox"]:checked`);
-  let indexes = Array.from(checkboxes).map(cb=>parseInt(cb.dataset.index));
-  if(indexes.length===0){ alert("Select at least one item."); return; }
+  if(checkboxes.length===0){ alert("Select at least one item."); return; }
   if(confirm("Delete selected items?")){
-    indexes.sort((a,b)=>b-a).forEach(i=>items.splice(i,1));
+    let indexes = Array.from(checkboxes).map(cb=>parseInt(cb.dataset.index)).sort((a,b)=>b-a);
+    indexes.forEach(i=>items.splice(i,1));
     save(); render();
   }
 }
 
 function render(){
-  const watchedDiv = document.getElementById("watchedList");
-  const wishlistDiv = document.getElementById("wishlistList");
+  const watchedDiv=document.getElementById("watchedList");
+  const wishlistDiv=document.getElementById("wishlistList");
   watchedDiv.innerHTML=""; wishlistDiv.innerHTML="";
   let filtered = watched.filter(e=>{
     let match=true;
     if(timeFilter==="thisYear") match=match&&e.date&&new Date(e.date).getFullYear()===new Date().getFullYear();
-    if(timeFilter==="lastMonth"){ let today=new Date(); let lastMonth=new Date(today.getFullYear(),today.getMonth()-1); let d=new Date(e.date); match=match&&d.getMonth()===lastMonth.getMonth()&&d.getFullYear()===lastMonth.getFullYear(); }
+    if(timeFilter==="lastMonth"){ let today=new Date(); let lastMonth=new Date(today.getFullYear(),today.getMonth()-1); let d=new Date(e.date); match=match&&d.getMonth()===lastMonth.getMonth()&&d.getFullYear()===lastMonth.getFullYear();}
     if(genreFilter&&genreFilter!=="all") match=match&&e.genre.toLowerCase()===genreFilter;
     if(typeFilter&&typeFilter!=="all") match=match&&e.type.toLowerCase()===typeFilter;
     return match;
   });
   filtered.forEach((e,i)=>{
-    watchedDiv.innerHTML+=`<div class="card"><input type="checkbox" data-index="${i}"><div class="card-content"><strong>${e.title}</strong><br>Type: ${e.type}<br>Genre: ${e.genre}<br>Rating: ${e.rating}/10<br>Date: ${e.date}<br>Notes: ${e.notes></div><button class="delete-btn" onclick="deleteWatched(${i})">×</button></div>`;
+    watchedDiv.innerHTML+=`<div class="card"><input type="checkbox" data-index="${i}"><div class="card-content"><strong>${e.title}</strong><br>Type: ${e.type}<br>Genre: ${e.genre}<br>Rating: ${e.rating}/10<br>Date: ${e.date}<br>Notes: ${e.notes}</div><button class="delete-btn" onclick="deleteWatched(${i})">×</button></div>`;
   });
   wishlist.forEach((e,i)=>{
-    wishlistDiv.innerHTML+=`<div class="card"><input type="checkbox" data-index="${i}"><div class="card-content"><strong>${e.title}</strong><br>Type: ${e.type}<br>Genre: ${e.genre}<br>Rating: ${e.rating}/10<br>Date: ${e.date}<br>Notes: ${e.notes}</div><button class="delete-btn" onclick="deleteWishlist(${i})">×</button><button class="success" onclick="moveToWatched(${i})" style="margin-left:10px;padding:6px 10px;font-size:14px;">→</button></div>`;
+    wishlistDiv.innerHTML+=`<div class="card"><input type="checkbox" data-index="${i}"><div class="card-content"><strong>${e.title}</strong><br>Type: ${e.type}<br>Genre: ${e.genre}<br>Rating: ${e.rating}/10<br>Date: ${e.date}<br>Notes: ${e.notes}</div><button class="move-btn" onclick="moveToWatched(${i})">→</button><button class="delete-btn" onclick="deleteWishlist(${i})">×</button></div>`;
   });
-  document.getElementById("watchedCount").innerText="Filtered Results: "+filtered.length;
 }
-
 render();
 </script>
-
 </div>
 </body>
 </html>
