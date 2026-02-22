@@ -68,42 +68,50 @@ input, select, textarea {
   color: white; padding: 12px; border-radius: 14px; font-size: 14px; height: 48px;
 }
 
-/* --- THE DATE BUTTON BOX FIX --- */
+/* --- NUCLEAR DATE FIX --- */
 input[type="date"] {
   display: block;
-  -webkit-appearance: none;
-  appearance: none;
+  appearance: none; -webkit-appearance: none;
+  background-color: var(--input-bg);
   padding: 0 12px;
-  text-align: left;
-  overflow: hidden;
-  max-width: 100%; /* Forces it to stay inside the grid column */
+  line-height: 48px; /* Matches height for vertical centering */
+  text-align: center;
 }
 
 /* Section labels */
 .section-label { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin: 30px 0 10px 6px; }
 
-/* Cards */
+/* Expanded Cards Styling */
 .card {
   background: var(--card-bg); border-radius: 20px; padding: 16px 18px;
   margin-bottom: 10px; border: 1px solid var(--glass-border);
-  position: relative; display: flex; align-items: flex-start;
+  position: relative; transition: all 0.3s ease;
+  cursor: pointer;
 }
-.card-info { flex: 1; padding-right: 70px; }
+
 .card-info h3 { margin: 0; font-size: 16px; font-weight: 600; color: #eee; }
-.tag { font-size: 9px; color: var(--text-dim); background: rgba(255,255,255,0.04); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+.tag { font-size: 9px; color: var(--text-dim); background: rgba(255,255,255,0.04); padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 4px; }
+
+/* Hidden Details Area */
+.details {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease, margin-top 0.3s ease;
+  border-top: 1px solid transparent;
+}
+.card.open .details {
+  max-height: 200px; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.detail-item { font-size: 12px; margin-bottom: 8px; color: var(--text-dim); }
+.detail-item strong { color: var(--primary); font-weight: 600; margin-right: 5px; }
+.notes-box { font-style: italic; color: #ccc; line-height: 1.4; }
 
 /* Controls */
-.card-controls { position: absolute; top: 16px; right: 10px; display: flex; align-items: center; gap: 10px; }
-
-.move-btn { background: none; border: none; color: var(--success); font-size: 16px; padding: 4px; opacity: 0.8; cursor: pointer; }
-
-.card-check { 
-  width: 14px; height: 14px; accent-color: var(--primary);
-  opacity: 0.25; cursor: pointer;
-}
+.card-controls { position: absolute; top: 16px; right: 10px; display: flex; align-items: center; gap: 10px; z-index: 10; }
+.move-btn { background: none; border: none; color: var(--success); font-size: 16px; cursor: pointer; }
+.card-check { width: 14px; height: 14px; accent-color: var(--primary); opacity: 0.25; }
 .card-check:checked { opacity: 1; }
-
-.del-btn { background: none; border: none; color: var(--text-dim); font-size: 18px; padding: 4px; opacity: 0.5; cursor: pointer; }
+.del-btn { background: none; border: none; color: var(--text-dim); font-size: 18px; opacity: 0.5; cursor: pointer; }
 
 /* Floating Button */
 .fab {
@@ -121,7 +129,7 @@ input[type="date"] {
 @media print {
   .fab, .filter-bar, .export-btn, .card-controls, .delete-bar, .overlay { display: none !important; }
   .card { border: 1px solid #ddd !important; color: black !important; background: white !important; }
-  .card-info h3 { color: black !important; }
+  .details { max-height: none !important; display: block !important; border-top: 1px solid #eee; }
 }
 </style>
 </head>
@@ -137,7 +145,7 @@ input[type="date"] {
     <h1>Procrastination Productions</h1>
     <p id="stats">Wasting time productively</p>
   </div>
-  <button class="export-btn" onclick="window.print()">PDF</button>
+  <button class="export-btn" onclick="window.print()">PDF Report</button>
 </div>
 
 <div class="filter-bar">
@@ -145,7 +153,6 @@ input[type="date"] {
   <select id="fGenre" class="minimal-select" onchange="render()"><option value="all">Genres</option>
     <option>Action</option><option>Drama</option><option>Comedy</option><option>Romance</option><option>Thriller</option><option>Sci-Fi</option><option>Horror</option><option>Mystery</option><option>Superhero</option><option>Spy</option><option>FamilyDrama</option><option>Fantasy</option><option>Animation</option><option>Cartoon</option><option>Documentary</option><option>Biography</option><option>Travel</option><option>Musical</option><option>Crime</option><option>RealityShow</option><option>GameShow</option><option>TalkShow</option>
   </select>
-  <select id="fSort" class="minimal-select" onchange="render()"><option value="newest">Recent</option><option value="alpha">A-Z</option></select>
 </div>
 
 <div id="watchedList"></div>
@@ -164,11 +171,11 @@ input[type="date"] {
     </div>
     
     <div class="input-grid">
-      <input id="rating" type="number" placeholder="Rating">
+      <input id="rating" type="number" placeholder="Rating (1-10)">
       <input id="date" type="date">
     </div>
 
-    <textarea id="notes" placeholder="Notes..." rows="2" style="height:auto; margin-bottom: 15px;"></textarea>
+    <textarea id="notes" placeholder="Add your notes here..." rows="3" style="height:auto; margin-bottom: 15px;"></textarea>
     
     <div style="display:flex; gap:10px;">
       <button onclick="addItem('watched')" style="flex:1; background:var(--primary); color:white; border:none; height:50px; border-radius:14px; font-weight:700;">Watched</button>
@@ -180,8 +187,8 @@ input[type="date"] {
 <button class="fab" onclick="document.getElementById('addOverlay').style.display='flex'">+</button>
 
 <script>
-let items = JSON.parse(localStorage.getItem("proc_prod_v3")) || { watched: [], wishlist: [] };
-function save() { localStorage.setItem("proc_prod_v3", JSON.stringify(items)); }
+let items = JSON.parse(localStorage.getItem("proc_prod_v4")) || { watched: [], wishlist: [] };
+function save() { localStorage.setItem("proc_prod_v4", JSON.stringify(items)); }
 
 function addItem(list) {
   const title = document.getElementById('title').value;
@@ -190,19 +197,21 @@ function addItem(list) {
     id: Date.now(), title,
     type: document.getElementById('type').value,
     genre: document.getElementById('genre').value || 'Other',
-    rating: document.getElementById('rating').value || 0,
+    rating: document.getElementById('rating').value || 'N/A',
     date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-    notes: document.getElementById('notes').value
+    notes: document.getElementById('notes').value || "No notes added."
   };
   items[list].unshift(item);
   save(); render();
   document.getElementById('addOverlay').style.display = 'none';
-  document.getElementById('title').value = "";
+  ['title', 'notes', 'rating'].forEach(id => document.getElementById(id).value = "");
 }
 
 function closeForm(e) { document.getElementById('addOverlay').style.display = 'none'; }
 function deleteOne(list, id) { if(confirm("Remove?")) { items[list] = items[list].filter(i => i.id !== id); save(); render(); } }
-function moveOne(id) {
+
+function moveOne(id, e) {
+  e.stopPropagation(); // Prevents card from expanding when clicking move
   const idx = items.wishlist.findIndex(i => i.id === id);
   if(idx > -1) {
     const item = items.wishlist.splice(idx, 1)[0];
@@ -232,38 +241,40 @@ function deleteBulk() {
 function render() {
   const fType = document.getElementById('fType').value;
   const fGenre = document.getElementById('fGenre').value;
-  const fSort = document.getElementById('fSort').value;
 
   ['watched', 'wishlist'].forEach(list => {
     const div = document.getElementById(list + 'List');
     div.innerHTML = `<div class="section-label">${list}</div>`;
     let filtered = items[list].filter(i => (fType === 'all' || i.type === fType) && (fGenre === 'all' || i.genre === fGenre));
     
-    if(fSort === 'alpha') filtered.sort((a,b) => a.title.localeCompare(b.title));
-    else filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-
     filtered.forEach(item => {
       const card = document.createElement('div');
       card.className = 'card';
+      card.onclick = function() { this.classList.toggle('open'); };
       card.innerHTML = `
+        <div class="card-controls">
+          ${list === 'wishlist' ? `<button class="move-btn" onclick="moveOne(${item.id}, event)">✓</button>` : ''}
+          <input type="checkbox" class="card-check" value="${item.id}" onclick="event.stopPropagation()" onchange="updateSelectCount()">
+          <button class="del-btn" onclick="event.stopPropagation(); deleteOne('${list}', ${item.id})">×</button>
+        </div>
         <div class="card-info">
           <h3>${item.title}</h3>
-          <div style="display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;">
+          <div style="margin-top:6px;">
             <span class="tag">${item.type}</span>
             <span class="tag">${item.genre}</span>
-            ${item.rating > 0 ? `<span style="color:#fbbf24; font-size:10px; font-weight:800;">★ ${item.rating}</span>` : ''}
+            <span style="color:#fbbf24; font-size:10px; font-weight:800;">★ ${item.rating}</span>
           </div>
-        </div>
-        <div class="card-controls">
-          ${list === 'wishlist' ? `<button class="move-btn" onclick="moveOne(${item.id})">✓</button>` : ''}
-          <input type="checkbox" class="card-check" value="${item.id}" onchange="updateSelectCount()">
-          <button class="del-btn" onclick="deleteOne('${list}', ${item.id})">×</button>
+          <div class="details">
+            <div class="detail-item"><strong>Log Date:</strong> ${item.date}</div>
+            <div class="detail-item"><strong>Notes:</strong></div>
+            <div class="notes-box">${item.notes}</div>
+          </div>
         </div>
       `;
       div.appendChild(card);
     });
   });
-  document.getElementById('stats').innerText = `${items.watched.length + items.wishlist.length} Items Logged`;
+  document.getElementById('stats').innerText = `${items.watched.length + items.wishlist.length} Items Total`;
 }
 
 render();
