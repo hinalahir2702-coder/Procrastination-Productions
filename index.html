@@ -175,10 +175,10 @@ function toggleMenu(id) {
 
 function render() {
   watchedList.innerHTML = "";
-  wishlist.innerHTML = "";
+  document.getElementById("wishlist").innerHTML = "";
 
   watched.forEach((e, i) => {
-    watchedList.innerHTML += `
+    document.getElementById("wishlist").innerHTML += `
       <div class="card">
         <div class="top-row">
           <div>
