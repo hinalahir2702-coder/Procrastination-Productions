@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Procrastination Productions</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
   --primary: #a78bfa;
   --success: #10b981;
+  --progress: #3b82f6;
   --danger: #ff4bb4;
   --bg: #09090b;
   --card-bg: #18181b;
@@ -18,7 +20,8 @@
   --text-dim: #71717a; 
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+input, textarea { user-select: text; }
 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -26,221 +29,303 @@ body {
   background-image: radial-gradient(circle at 0% 0%, rgba(167, 139, 250, 0.08) 0%, transparent 40%);
   color: var(--text);
   margin: 0;
-  padding: 20px 16px 120px;
+  padding: 20px 16px 150px;
 }
 
-/* Header */
 .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
 .header h1 { 
   font-size: 22px; font-weight: 800; margin: 0; 
   background: linear-gradient(to right, #fff, var(--primary));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.header p { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+.header p { color: var(--text-dim); font-size: 11px; margin-top: 4px; }
 
 .export-btn {
   background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
   color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 11px;
 }
 
-/* Filter Bar - REINSTATED FULL CONTROLS */
 .filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
 .filter-bar::-webkit-scrollbar { display: none; }
 .minimal-select {
   background: var(--card-bg); border: 1px solid var(--glass-border);
-  color: var(--text-dim); padding: 8px 14px; border-radius: 12px; font-size: 12px;
-  min-width: 90px;
+  color: var(--text-dim); padding: 8px 14px; border-radius: 12px; font-size: 12px; min-width: 100px;
 }
 
-/* Modal */
 .overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.9);
   backdrop-filter: blur(12px); display: none; z-index: 2000;
   align-items: center; justify-content: center; padding: 20px;
 }
 .modal {
-  background: #111113; width: 100%; max-width: 380px;
+  background: #111113; width: 100%; max-width: 400px;
   padding: 24px; border-radius: 28px; border: 1px solid var(--glass-border);
+  max-height: 90vh; overflow-y: auto;
 }
 
 .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 input, select, textarea {
   width: 100%; background: var(--input-bg); border: 1px solid var(--glass-border);
-  color: white; padding: 12px; border-radius: 14px; font-size: 14px; height: 48px;
+  color: white; padding: 12px; border-radius: 14px; font-size: 14px; height: 52px;
 }
-input[type="date"] { display: block; -webkit-appearance: none; line-height: 48px; text-align: center; }
 
-/* Cards */
+input[type="date"] { display: flex; align-items: center; justify-content: center; -webkit-appearance: none; appearance: none; padding: 0 12px; text-align: center; }
+
 .section-label { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin: 30px 0 10px 6px; }
 
 .card {
-  background: var(--card-bg); border-radius: 20px; padding: 16px 18px;
+  background: var(--card-bg); border-radius: 20px; padding: 18px;
   margin-bottom: 12px; border: 1px solid var(--glass-border);
   position: relative; cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.2s;
 }
 
-.card-info h3 { margin: 0; font-size: 17px; font-weight: 600; color: #eee; padding-right: 75px; }
+.card.selected { border-color: var(--primary); background: rgba(167, 139, 250, 0.05); transform: scale(0.98); }
+
+.card-info h3 { margin: 0; font-size: 17px; font-weight: 600; color: #eee; padding-right: 40px; }
 .tag { font-size: 9px; color: var(--text-dim); background: rgba(255,255,255,0.05); padding: 3px 7px; border-radius: 5px; text-transform: uppercase; margin-right: 4px; font-weight: 600; }
 
-/* Infinite Scrollable Notes */
-.details {
-  display: none; 
-  margin-top: 15px; padding-top: 15px;
-  border-top: 1px solid var(--glass-border);
-}
+.details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border); }
 .card.open .details { display: block; }
-.detail-item { font-size: 12px; margin-bottom: 6px; color: var(--text-dim); }
-.detail-item strong { color: var(--primary); }
-.notes-box { font-size: 14px; color: #d4d4d8; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+.notes-box { font-size: 14px; color: #d4d4d8; line-height: 1.6; white-space: pre-wrap; margin-top: 8px; }
 
-/* Controls */
-.card-controls { position: absolute; top: 16px; right: 12px; display: flex; align-items: center; gap: 12px; z-index: 5; }
-.move-btn { background: none; border: none; color: var(--success); font-size: 18px; cursor: pointer; padding: 0; }
-.card-check { width: 15px; height: 15px; accent-color: var(--primary); opacity: 0.25; margin: 0; }
-.card-check:checked { opacity: 1; }
-.del-btn { background: none; border: none; color: var(--text-dim); font-size: 18px; opacity: 0.4; cursor: pointer; padding: 0; }
+.card-controls { position: absolute; top: 18px; right: 12px; z-index: 10; }
+.dots-btn { background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; }
+
+.menu-dropdown {
+  position: absolute; top: 30px; right: 0; background: #222226; border: 1px solid var(--glass-border);
+  border-radius: 12px; display: none; flex-direction: column; width: 120px; z-index: 100; overflow: hidden;
+}
+.menu-dropdown.show { display: flex; }
+.menu-item { background: none; border: none; color: white; padding: 12px; font-size: 12px; text-align: left; width: 100%; cursor: pointer; border-bottom: 1px solid var(--glass-border); }
 
 .fab {
   position: fixed; bottom: 30px; right: 25px;
   width: 60px; height: 60px; border-radius: 20px;
   background: var(--primary); border: none; color: white; font-size: 30px; z-index: 1000;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
 .delete-bar {
   position: fixed; top: 0; left: 0; width: 100%; height: 60px;
-  background: #161618; border-bottom: 1px solid var(--danger);
+  background: #161618; border-bottom: 1px solid var(--primary);
   display: none; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 3000;
 }
+.del-btn-small { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 10px; text-transform: uppercase; }
+.cancel-btn { color: var(--text-dim); background: none; border: none; font-size: 12px; font-weight: 600; }
+
+.data-footer {
+  margin-top: 50px; padding: 20px; border-top: 1px solid var(--glass-border);
+  display: flex; gap: 10px; justify-content: center;
+}
+.transfer-btn { background: none; border: 1px solid var(--glass-border); color: var(--text-dim); font-size: 10px; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+
 </style>
 </head>
 <body>
 
 <div class="delete-bar" id="deleteBar">
-  <span id="selCount" style="font-size:13px; font-weight:600;">0 Selected</span>
-  <button onclick="deleteBulk()" style="background:var(--danger); color:white; border:none; padding:8px 16px; border-radius:10px; font-weight:800; font-size:11px;">Delete Forever</button>
+  <button onclick="exitSelectionMode()" class="cancel-btn">Cancel</button>
+  <span id="selCount" style="font-size:13px; font-weight:800;">1 Selected</span>
+  <button onclick="deleteBulk()" class="del-btn-small">Delete</button>
 </div>
 
 <div class="header-flex">
   <div class="header">
     <h1>Procrastination Productions</h1>
-    <p id="stats">0 Items Logged</p>
+    <p id="stats">All systems go</p>
   </div>
-  <button class="export-btn" onclick="window.print()">PDF Report</button>
+  <button class="export-btn" onclick="generatePdf()">Download PDF</button>
 </div>
 
 <div class="filter-bar">
   <select id="fType" class="minimal-select" onchange="render()"><option value="all">All Types</option><option>Movie</option><option>Series</option><option>Book</option></select>
-  <select id="fGenre" class="minimal-select" onchange="render()"><option value="all">All Genres</option>
-    <option>Action</option><option>Drama</option><option>Comedy</option><option>Romance</option><option>Thriller</option><option>Sci-Fi</option><option>Horror</option><option>Mystery</option><option>Superhero</option><option>Spy</option><option>FamilyDrama</option><option>Fantasy</option><option>Animation</option><option>Cartoon</option><option>Documentary</option><option>Biography</option><option>Travel</option><option>Musical</option><option>Crime</option><option>RealityShow</option><option>GameShow</option><option>TalkShow</option>
-  </select>
+  <select id="fGenre" class="minimal-select" onchange="render()"></select>
   <select id="fSort" class="minimal-select" onchange="render()"><option value="newest">Newest</option><option value="alpha">A-Z</option></select>
 </div>
 
-<div id="watchedList"></div>
-<div id="wishlistList"></div>
+<div id="progressList"></div>
+<div id="queueList"></div>
+<div id="completedList"></div>
+
+<div class="data-footer">
+  <button class="transfer-btn" onclick="exportData()">Export Backup</button>
+  <button class="transfer-btn" onclick="importData()">Import & Merge</button>
+</div>
 
 <div class="overlay" id="addOverlay" onclick="closeForm(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <h2 style="margin: 0 0 15px; font-size: 18px; font-weight: 800;">Log Entry</h2>
-    <input id="title" placeholder="Title" style="margin-bottom: 10px;">
-    <div class="input-grid">
+    <h2 id="modalTitle" style="margin: 0 0 15px; font-size: 18px; font-weight: 800;">Log Entry</h2>
+    <input id="title" placeholder="Title">
+    <div class="input-grid" style="margin-top:10px;">
       <select id="type"><option>Movie</option><option>Series</option><option>Book</option></select>
-      <select id="genre"><option value="">Genre</option>
-        <option>Action</option><option>Drama</option><option>Comedy</option><option>Romance</option><option>Thriller</option><option>Sci-Fi</option><option>Horror</option><option>Mystery</option><option>Superhero</option><option>Spy</option><option>FamilyDrama</option><option>Fantasy</option><option>Animation</option><option>Cartoon</option><option>Documentary</option><option>Biography</option><option>Travel</option><option>Musical</option><option>Crime</option><option>RealityShow</option><option>GameShow</option><option>TalkShow</option>
-      </select>
+      <select id="genre"></select>
     </div>
     <div class="input-grid">
       <input id="rating" type="number" placeholder="Rating/10">
       <input id="date" type="date">
     </div>
-    <textarea id="notes" placeholder="Write your full thoughts here..." style="height:100px; padding-top:12px; margin-bottom: 15px;"></textarea>
-    <div style="display:flex; gap:10px;">
-      <button onclick="addItem('watched')" style="flex:1; background:var(--primary); color:white; border:none; height:50px; border-radius:14px; font-weight:700;">Watched</button>
-      <button onclick="addItem('wishlist')" style="flex:1; background:var(--success); color:white; border:none; height:50px; border-radius:14px; font-weight:700;">Wishlist</button>
+    <textarea id="notes" placeholder="Write your thoughts here..." style="height:120px; padding-top:12px; margin-bottom: 15px;"></textarea>
+    
+    <div id="modalButtons" style="display:flex; flex-direction:column; gap:10px;">
+      <div style="display:flex; gap:10px;">
+        <button onclick="handleSave('progress')" style="flex:1; background:var(--progress); color:white; border:none; height:50px; border-radius:14px; font-weight:700;">In Progress</button>
+        <button onclick="handleSave('queue')" style="flex:1; background:var(--success); color:white; border:none; height:50px; border-radius:14px; font-weight:700;">Queue</button>
+      </div>
+      <button onclick="handleSave('completed')" style="background:var(--primary); color:white; border:none; height:50px; border-radius:14px; font-weight:700;">Completed</button>
     </div>
   </div>
 </div>
 
-<button class="fab" onclick="document.getElementById('addOverlay').style.display='flex'">+</button>
+<button class="fab" onclick="openForAdd()">+</button>
 
 <script>
-let items = JSON.parse(localStorage.getItem("proc_prod_vfinal")) || { watched: [], wishlist: [] };
-function save() { localStorage.setItem("proc_prod_vfinal", JSON.stringify(items)); }
+const ALL_GENRES = ["Action", "Drama", "Comedy", "Romance", "Thriller", "Sci-Fi", "Horror", "Mystery", "Superhero", "Spy", "FamilyDrama", "Fantasy", "Animation", "Cartoon", "Documentary", "Biography", "Travel", "Musical", "Crime", "RealityShow", "GameShow", "TalkShow", "Fiction", "Non-Fiction", "Historical", "Self-Help", "Poetry", "Classics", "Other"];
 
-function addItem(list) {
-  const title = document.getElementById('title').value;
-  if(!title) return;
-  const item = {
-    id: Date.now(), title,
-    type: document.getElementById('type').value,
-    genre: document.getElementById('genre').value || 'Other',
-    rating: document.getElementById('rating').value || '?',
-    date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
-    notes: document.getElementById('notes').value || "No notes."
-  };
-  items[list].unshift(item);
-  save(); render();
-  document.getElementById('addOverlay').style.display = 'none';
-  ['title', 'notes', 'rating'].forEach(id => document.getElementById(id).value = "");
-}
-
-function closeForm(e) { document.getElementById('addOverlay').style.display = 'none'; }
-function deleteOne(list, id) { if(confirm("Remove?")) { items[list] = items[list].filter(i => i.id !== id); save(); render(); } }
-
-function moveOne(id, e) {
-  e.stopPropagation();
-  const idx = items.wishlist.findIndex(i => i.id === id);
-  if(idx > -1) {
-    const item = items.wishlist.splice(idx, 1)[0];
-    items.watched.unshift(item);
-    save(); render();
-  }
-}
-
-function updateSelectCount() {
-  const checked = document.querySelectorAll('.card-check:checked').length;
-  document.getElementById('deleteBar').style.display = checked > 0 ? 'flex' : 'none';
-  document.getElementById('selCount').innerText = `${checked} Selected`;
-}
-
-function deleteBulk() {
-  const checked = document.querySelectorAll('.card-check:checked');
-  if(confirm(`Delete ${checked.length} selected items?`)) {
-    checked.forEach(cb => {
-      const id = parseInt(cb.value);
-      items.watched = items.watched.filter(i => i.id !== id);
-      items.wishlist = items.wishlist.filter(i => i.id !== id);
+function populateGenres() {
+  const selects = [document.getElementById('fGenre'), document.getElementById('genre')];
+  selects.forEach((sel, i) => {
+    sel.innerHTML = i === 0 ? '<option value="all">All Genres</option>' : '';
+    ALL_GENRES.sort().forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g; opt.innerText = g;
+      sel.appendChild(opt);
     });
-    save(); render(); updateSelectCount();
+  });
+}
+
+const STORAGE_KEY = "proc_prod_vJsPdf";
+let items = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { completed: [], queue: [], progress: [] };
+let editingId = null;
+let editingFromList = null;
+let selectionMode = false;
+let selectedIds = new Set();
+let pressTimer;
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+
+// EXPORT/IMPORT (Kept working version)
+function exportData() {
+  const dataStr = JSON.stringify(items);
+  prompt("Copy this code and save it in a safe place:", dataStr);
+}
+
+function importData() {
+  const code = prompt("Paste your backup code here:");
+  if (code) {
+    try {
+      const imported = JSON.parse(code);
+      if (imported.completed && imported.queue && imported.progress) {
+        
+        ['completed', 'queue', 'progress'].forEach(listName => {
+          if (imported[listName]) {
+            imported[listName].forEach(newItem => {
+              let exists = false;
+              ['completed', 'queue', 'progress'].forEach(currentListName => {
+                const index = items[currentListName].findIndex(item => item.id === newItem.id);
+                if (index !== -1) {
+                  items[currentListName][index] = newItem;
+                  exists = true;
+                }
+              });
+              if (!exists) {
+                items[listName].push(newItem);
+              }
+            });
+          }
+        });
+        save();
+        render();
+        alert("Data merged successfully!");
+      } else { alert("Invalid backup code."); }
+    } catch (err) { alert("Error reading code. Ensure it is correct."); }
   }
 }
+
+// PDF LOGIC (Uses jspdf library)
+function generatePdf() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  let y = 10;
+  doc.setFontSize(18);
+  doc.text("Procrastination Productions Report", 10, y);
+  y += 15;
+
+  ['progress', 'queue', 'completed'].forEach(listName => {
+    doc.setFontSize(14);
+    doc.setTextColor(167, 139, 250); // Primary color
+    doc.text(listName.toUpperCase(), 10, y);
+    y += 10;
+    doc.setTextColor(0, 0, 0); // Black
+
+    items[listName].forEach(item => {
+      if (y > 280) { doc.addPage(); y = 10; } // Basic pagination
+      doc.setFontSize(12);
+      doc.text(`${item.title} (${item.type}) - ${item.rating}/10`, 10, y);
+      y += 6;
+      doc.setFontSize(10);
+      doc.text(`Genre: ${item.genre} | Date: ${item.date}`, 10, y);
+      y += 6;
+      doc.text(`Notes: ${item.notes}`, 10, y, { maxWidth: 180 });
+      y += 12;
+    });
+    y += 5;
+  });
+
+  doc.save("Productions_Report.pdf");
+}
+
+// SELECTION LOGIC
+function handleStart(id) { pressTimer = window.setTimeout(() => { selectionMode = true; toggleSelect(id); }, 500); }
+function handleEnd() { clearTimeout(pressTimer); }
+function toggleSelect(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  if (selectedIds.size === 0) exitSelectionMode();
+  else {
+    document.getElementById('deleteBar').style.display = 'flex';
+    document.getElementById('selCount').innerText = `${selectedIds.size} Selected`;
+    render();
+  }
+}
+function exitSelectionMode() { selectionMode = false; selectedIds.clear(); document.getElementById('deleteBar').style.display = 'none'; render(); }
+function handleCardClick(id, element) { if (selectionMode) toggleSelect(id); else element.classList.toggle('open'); }
+function toggleMenu(id, e) { e.stopPropagation(); if (selectionMode) return; const menu = document.getElementById(`menu-${id}`); document.querySelectorAll('.menu-dropdown').forEach(m => { if(m !== menu) m.classList.remove('show'); }); menu.classList.toggle('show'); }
+function deleteBulk() { if(confirm(`Delete ${selectedIds.size} items?`)) { Object.keys(items).forEach(list => { items[list] = items[list].filter(i => !selectedIds.has(i.id)); }); save(); exitSelectionMode(); } }
+
+// UI LOGIC
+function openForAdd() { editingId = null; document.getElementById('modalTitle').innerText = "Log Entry"; ['title', 'notes', 'rating'].forEach(id => document.getElementById('addOverlay').querySelector('#' + id).value = ""); document.getElementById('date').value = new Date().toISOString().split('T')[0]; document.getElementById('addOverlay').style.display = 'flex'; }
+function openForEdit(list, id, e) { e.stopPropagation(); const item = items[list].find(i => i.id === id); editingId = id; editingFromList = list; document.getElementById('modalTitle').innerText = "Edit Entry"; document.getElementById('title').value = item.title; document.getElementById('type').value = item.type; document.getElementById('genre').value = item.genre; document.getElementById('rating').value = item.rating; document.getElementById('date').value = item.date; document.getElementById('notes').value = item.notes; document.getElementById('addOverlay').style.display = 'flex'; }
+function handleSave(toList) { const title = document.getElementById('title').value; if(!title) return; const newItem = { id: editingId || Date.now(), title, type: document.getElementById('type').value, genre: document.getElementById('genre').value, rating: document.getElementById('rating').value || '?', date: document.getElementById('date').value, notes: document.getElementById('notes').value || "" }; if(editingId) { items[editingFromList] = items[editingFromList].filter(i => i.id !== editingId); } items[toList].unshift(newItem); save(); render(); document.getElementById('addOverlay').style.display = 'none'; }
+function closeForm(e) { document.getElementById('addOverlay').style.display = 'none'; }
 
 function render() {
   const fType = document.getElementById('fType').value;
   const fGenre = document.getElementById('fGenre').value;
   const fSort = document.getElementById('fSort').value;
-
-  ['watched', 'wishlist'].forEach(list => {
-    const div = document.getElementById(list + 'List');
-    div.innerHTML = `<div class="section-label">${list}</div>`;
-    
-    let filtered = items[list].filter(i => (fType === 'all' || i.type === fType) && (fGenre === 'all' || i.genre === fGenre));
-    
-    // REINSTATED SORTING LOGIC
+  const sections = [{key:'progress', label:'In Progress'}, {key:'queue', label:'Queue'}, {key:'completed', label:'Completed'}];
+  sections.forEach(sec => {
+    const div = document.getElementById(sec.key + 'List');
+    div.innerHTML = `<div class="section-label">${sec.label}</div>`;
+    let filtered = items[sec.key].filter(i => (fType === 'all' || i.type === fType) && (fGenre === 'all' || i.genre === fGenre));
     if(fSort === 'alpha') filtered.sort((a,b) => a.title.localeCompare(b.title));
     else filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
-
     filtered.forEach(item => {
+      const isSelected = selectedIds.has(item.id);
       const card = document.createElement('div');
-      card.className = 'card';
-      card.onclick = function() { this.classList.toggle('open'); };
-      
+      card.className = `card ${isSelected ? 'selected' : ''}`;
+      card.onmousedown = () => handleStart(item.id);
+      card.onmouseup = handleEnd;
+      card.ontouchstart = () => handleStart(item.id);
+      card.ontouchend = handleEnd;
+      card.onclick = () => handleCardClick(item.id, card);
       card.innerHTML = `
         <div class="card-controls">
-          ${list === 'wishlist' ? `<button class="move-btn" onclick="moveOne(${item.id}, event)">✓</button>` : ''}
-          <input type="checkbox" class="card-check" value="${item.id}" onclick="event.stopPropagation()" onchange="updateSelectCount()">
-          <button class="del-btn" onclick="event.stopPropagation(); deleteOne('${list}', ${item.id})">×</button>
+          <button class="dots-btn" onclick="toggleMenu(${item.id}, event)">⋮</button>
+          <div class="menu-dropdown" id="menu-${item.id}">
+            <button class="menu-item" onclick="openForEdit('${sec.key}', ${item.id}, event)">Edit Entry</button>
+            <button class="menu-item" style="color:var(--danger)" onclick="selectedIds.add(${item.id}); deleteBulk();">Delete</button>
+          </div>
         </div>
         <div class="card-info">
           <h3>${item.title}</h3>
@@ -250,8 +335,7 @@ function render() {
             <span style="color:#fbbf24; font-size:11px; font-weight:800;">★ ${item.rating}</span>
           </div>
           <div class="details">
-            <div class="detail-item"><strong>Log Date:</strong> ${item.date}</div>
-            <div class="detail-item"><strong>Notes:</strong></div>
+            <div style="font-size:12px; color:var(--text-dim)"><strong>Logged:</strong> ${item.date}</div>
             <div class="notes-box">${item.notes}</div>
           </div>
         </div>
@@ -259,9 +343,10 @@ function render() {
       div.appendChild(card);
     });
   });
-  document.getElementById('stats').innerText = `${items.watched.length + items.wishlist.length} Items Total`;
+  document.getElementById('stats').innerText = `${items.completed.length + items.queue.length + items.progress.length} Total Items`;
 }
 
+populateGenres();
 render();
 </script>
 </body>
